@@ -255,6 +255,11 @@ function goToday() { curDate=new Date(); render(); }
 function nowTime() { return new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}); }
 function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// Strip only pure list markers like "1. " "- " "· " but NOT "13.3寸"
+function stripMarker(line) {
+  return line.replace(/^(?:[-·•]\s*|\d+[.、]\s+)/,'');
+}
+
 // ── Work: two input areas ──
 function addWorkDone() {
   const el = document.getElementById('workDoneInput');
@@ -263,7 +268,7 @@ function addWorkDone() {
   text.split('\n').map(l=>l.trim()).filter(Boolean).forEach((line,i)=>{
     entries.push({
       id: Date.now().toString(36)+Math.random().toString(36).slice(2,5)+i,
-      content: line.replace(/^[-·•\d.、\s]+/,''),
+      content: stripMarker(line),
       done: true, date: dateStr, time: time, doneTime: time
     });
   });
@@ -277,7 +282,7 @@ function addWorkTodo() {
   text.split('\n').map(l=>l.trim()).filter(Boolean).forEach((line,i)=>{
     entries.push({
       id: Date.now().toString(36)+Math.random().toString(36).slice(2,5)+i,
-      content: line.replace(/^[-·•\d.、\s]+/,''),
+      content: stripMarker(line),
       done: false, date: dateStr, time: time, doneTime: null
     });
   });
@@ -291,7 +296,19 @@ function toggleWork(id) {
 function delWork(id) { save(KEYS.work, load(KEYS.work).filter(x=>x.id!==id)); render(); }
 
 function getWorkForDate(dateStr) {
-  return load(KEYS.work).filter(e=>e.date===dateStr).sort((a,b)=>{ if(a.done!==b.done) return a.done?1:-1; return 0; });
+  const all = load(KEYS.work);
+  // Get entries for this date
+  let items = all.filter(e=>e.date===dateStr);
+  // Carry over: find uncompleted todos from previous days
+  const carried = all.filter(e=>e.date<dateStr && !e.done && e.type!=='carried_'+dateStr);
+  // Add carried items (avoid duplicates by checking if already carried)
+  const existingContents = new Set(items.map(e=>e.content));
+  carried.forEach(e=>{
+    if(!existingContents.has(e.content)){
+      items.push({...e, carriedFrom: e.date, isCarried: true});
+    }
+  });
+  return items.sort((a,b)=>{ if(a.done!==b.done) return a.done?1:-1; return 0; });
 }
 
 function genWorkSummary() {
@@ -413,7 +430,8 @@ function render() {
     if(wUndone.length) {
       wHTML+=`<div class="section-label">📌 待办事项（${wUndone.length}）</div><ul class="task-list">`;
       wUndone.forEach(e=>{
-        wHTML+=`<li class="task-item"><button class="task-cb" onclick="toggleWork('${e.id}')"></button><div style="flex:1"><span class="task-text">${esc(e.content)}</span><div class="task-time">${e.time} 添加</div></div><button class="task-del" onclick="delWork('${e.id}')">✕</button></li>`;
+        const carried = e.isCarried ? `<span style="font-size:0.65rem;background:var(--orange);color:#fff;padding:1px 6px;border-radius:6px;margin-left:6px;">顺延自${e.carriedFrom}</span>` : '';
+        wHTML+=`<li class="task-item"><button class="task-cb" onclick="toggleWork('${e.id}')"></button><div style="flex:1"><span class="task-text">${esc(e.content)}${carried}</span><div class="task-time">${e.time} 添加</div></div><button class="task-del" onclick="delWork('${e.id}')">✕</button></li>`;
       });
       wHTML+='</ul>';
     }
