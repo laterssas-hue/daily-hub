@@ -15,7 +15,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, 'SF Pro', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-/* Header */
 .header { text-align: center; padding: 28px 16px 12px; }
 .header h1 { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .date-bar { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 10px 0 20px; }
@@ -23,33 +22,39 @@ body { font-family: -apple-system, 'SF Pro', 'Segoe UI', sans-serif; background:
 .date-bar button:hover { border-color: var(--accent); color: var(--accent); }
 .date-bar .date-text { font-size: 1rem; font-weight: 700; min-width: 140px; text-align: center; }
 .date-bar .today-btn { font-size: 0.75rem; padding: 4px 12px; border-radius: 8px; background: var(--accent); color: #fff; border: none; cursor: pointer; font-weight: 600; }
-.date-bar .today-btn:hover { opacity: .85; }
 
-/* Layout */
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1400px; margin: 0 auto; padding: 0 16px 30px; }
 @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; max-width: 600px; } }
 
-/* Module */
-.module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
-.module-header { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; max-height: 85vh; }
+.module-header { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .module-header .icon { font-size: 1.3rem; }
 .module-header h2 { font-size: 1rem; font-weight: 700; }
 .module-header .badge { margin-left: auto; font-size: 0.7rem; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
-.badge-work { background: rgba(108,158,255,.15); color: var(--accent); }
-.badge-learn { background: rgba(167,139,250,.15); color: var(--purple); }
-.badge-train { background: rgba(244,114,182,.15); color: var(--pink); }
+.badge-work { background: rgba(74,126,255,.12); color: var(--accent); }
+.badge-learn { background: rgba(139,92,246,.12); color: var(--purple); }
+.badge-train { background: rgba(236,72,153,.12); color: var(--pink); }
 
-.module-body { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.module-body { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+
+/* Scrollbar */
+.module-body::-webkit-scrollbar { width: 4px; }
+.module-body::-webkit-scrollbar-track { background: transparent; }
+.module-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
 /* Input */
-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); font-size: 0.88rem; resize: vertical; min-height: 70px; outline: none; font-family: inherit; line-height: 1.6; transition: border-color .2s; }
+textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); font-size: 0.88rem; resize: vertical; min-height: 60px; outline: none; font-family: inherit; line-height: 1.6; transition: border-color .2s; }
 textarea:focus { border-color: var(--accent); }
 textarea::placeholder { color: var(--muted); }
+
+.input-section { background: var(--bg); border-radius: 10px; padding: 12px; }
+.input-section-label { font-size: 0.75rem; color: var(--muted); font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 
 .btn-row { display: flex; gap: 8px; justify-content: flex-end; }
 .btn { padding: 7px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all .2s; }
 .btn:hover { opacity: .85; }
 .btn-blue { background: var(--accent); color: #fff; }
+.btn-green { background: var(--green); color: #fff; }
 .btn-purple { background: var(--purple); color: #fff; }
 .btn-pink { background: var(--pink); color: #fff; }
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--sub); }
@@ -57,15 +62,16 @@ textarea::placeholder { color: var(--muted); }
 
 /* Tasks */
 .task-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-.task-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: 10px; transition: all .2s; }
+.task-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: 10px; transition: all .2s; word-break: break-word; }
 .task-item.done { opacity: .45; }
-.task-cb { width: 20px; height: 20px; min-width: 20px; border-radius: 50%; border: 2px solid var(--accent); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; margin-top: 2px; }
-.task-cb:hover { background: rgba(108,158,255,.1); }
+.task-cb { width: 20px; height: 20px; min-width: 20px; border-radius: 50%; border: 2px solid var(--accent); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; margin-top: 2px; flex-shrink: 0; }
+.task-cb:hover { background: rgba(74,126,255,.1); }
 .task-cb.checked { border-color: var(--green); background: var(--green); }
 .task-cb.checked::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 700; }
 .task-item.done .task-text { text-decoration: line-through; color: var(--muted); }
-.task-text { flex: 1; font-size: 0.85rem; line-height: 1.5; }
-.task-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.75rem; opacity: 0; transition: opacity .2s; }
+.task-text { flex: 1; font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
+.task-time { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+.task-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.75rem; opacity: 0; transition: opacity .2s; flex-shrink: 0; }
 .task-item:hover .task-del { opacity: 1; }
 .task-del:hover { color: var(--red); }
 
@@ -76,12 +82,15 @@ textarea::placeholder { color: var(--muted); }
 .progress-fill { height: 100%; border-radius: 6px; transition: width .4s ease; }
 .fill-blue { background: linear-gradient(90deg, var(--accent), var(--cyan)); }
 
+/* Section labels */
+.section-label { font-size: 0.75rem; color: var(--muted); font-weight: 600; padding-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+
 /* Training chips */
 .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--sub); cursor: pointer; font-size: 0.82rem; transition: all .2s; user-select: none; }
 .chip:hover { border-color: var(--pink); }
 .chip.active { background: var(--pink); color: #fff; border-color: var(--pink); }
-.chip-strength.active { background: var(--purple); border-color: var(--purple); }
+.chip-strength.active { background: var(--purple); border-color: var(--purple); color: #fff; }
 .chip-cardio.active { background: var(--cyan); border-color: var(--cyan); color: #000; }
 
 /* Summary */
@@ -89,38 +98,35 @@ textarea::placeholder { color: var(--muted); }
 .summary-box h4 { font-size: 0.8rem; color: var(--accent); margin-bottom: 8px; font-weight: 700; }
 .summary-box.learn h4 { color: var(--purple); }
 .summary-box.train h4 { color: var(--pink); }
-.summary-box .s-content { font-size: 0.83rem; line-height: 1.8; white-space: pre-wrap; color: var(--sub); }
-
-/* Section labels */
-.section-label { font-size: 0.75rem; color: var(--muted); font-weight: 600; padding-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.summary-box .s-content { font-size: 0.83rem; line-height: 1.8; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; color: var(--sub); }
 
 /* Learning display */
-.learn-entry { background: var(--bg); border-radius: 10px; padding: 12px; margin-bottom: 6px; }
+.learn-entry { background: var(--bg); border-radius: 10px; padding: 12px; margin-bottom: 6px; position: relative; }
 .learn-entry .le-time { font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; }
-.learn-entry .le-text { font-size: 0.85rem; line-height: 1.6; }
+.learn-entry .le-text { font-size: 0.85rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
 .learn-keywords { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.kw-tag { font-size: 0.7rem; padding: 2px 10px; border-radius: 8px; background: rgba(167,139,250,.12); color: var(--purple); }
+.kw-tag { font-size: 0.7rem; padding: 2px 10px; border-radius: 8px; background: rgba(139,92,246,.1); color: var(--purple); }
 
 /* Training log */
-.train-log { background: var(--bg); border-radius: 10px; padding: 12px; }
+.train-log { background: var(--bg); border-radius: 10px; padding: 12px; position: relative; margin-bottom: 6px; }
 .train-log .tl-items { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
 .train-log .tl-tag { font-size: 0.78rem; padding: 3px 12px; border-radius: 8px; }
-.tl-strength { background: rgba(167,139,250,.12); color: var(--purple); }
-.tl-cardio { background: rgba(34,211,238,.12); color: var(--cyan); }
+.tl-strength { background: rgba(139,92,246,.1); color: var(--purple); }
+.tl-cardio { background: rgba(6,182,212,.1); color: var(--cyan); }
 .train-log .tl-time { font-size: 0.7rem; color: var(--muted); }
 .intensity { font-size: 0.78rem; font-weight: 600; margin-top: 4px; }
 .int-low { color: var(--green); }
 .int-mid { color: var(--orange); }
 .int-high { color: var(--red); }
 
-/* Daily report */
-.report-btn { display: block; width: 100%; max-width: 1400px; margin: 0 auto 30px; padding: 12px; border-radius: var(--radius); border: 1px dashed var(--border); background: transparent; color: var(--sub); cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: all .2s; }
+/* Report */
+.report-btn { display: block; width: 100%; max-width: 1368px; margin: 0 auto 30px; padding: 12px 16px; border-radius: var(--radius); border: 1px dashed var(--border); background: transparent; color: var(--sub); cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: all .2s; }
 .report-btn:hover { border-color: var(--accent); color: var(--accent); }
-.report-modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.7); backdrop-filter: blur(8px); justify-content: center; align-items: center; padding: 20px; }
+.report-modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.5); backdrop-filter: blur(8px); justify-content: center; align-items: center; padding: 20px; }
 .report-modal.show { display: flex; }
 .report-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); max-width: 680px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 24px; }
 .report-card h3 { font-size: 1.1rem; margin-bottom: 16px; background: linear-gradient(135deg, var(--accent), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.report-card pre { font-family: inherit; white-space: pre-wrap; font-size: 0.88rem; line-height: 1.8; color: var(--sub); }
+.report-card pre { font-family: inherit; white-space: pre-wrap; word-break: break-word; font-size: 0.88rem; line-height: 1.8; color: var(--sub); }
 .report-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
 
 .empty { text-align: center; padding: 24px; color: var(--muted); font-size: 0.82rem; }
@@ -150,10 +156,24 @@ textarea::placeholder { color: var(--muted); }
       <span class="badge badge-work" id="workBadge">0 项</span>
     </div>
     <div class="module-body">
-      <textarea id="workInput" placeholder="输入待办事项，每行一个任务&#10;例：整理项目文档&#10;完成产品原型设计&#10;开团队会议"></textarea>
+      <!-- 已完成输入区 -->
+      <div class="input-section">
+        <div class="input-section-label">✅ 记录已完成的工作</div>
+        <textarea id="workDoneInput" placeholder="输入已完成的工作，每行一项&#10;例：整理项目文档&#10;开团队会议" rows="3"></textarea>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn btn-green" onclick="addWorkDone()">记录完成</button>
+        </div>
+      </div>
+      <!-- 待办输入区 -->
+      <div class="input-section">
+        <div class="input-section-label">📌 添加待办事项</div>
+        <textarea id="workTodoInput" placeholder="输入待办事项，每行一项&#10;例：完成产品原型设计&#10;写周报" rows="3"></textarea>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn btn-blue" onclick="addWorkTodo()">添加待办</button>
+        </div>
+      </div>
       <div class="btn-row">
-        <button class="btn btn-outline" onclick="genWorkSummary()">📊 总结</button>
-        <button class="btn btn-blue" onclick="addWork()">提交</button>
+        <button class="btn btn-outline" onclick="genWorkSummary()">📊 生成总结</button>
       </div>
       <div id="workProgress"></div>
       <div id="workList"></div>
@@ -202,7 +222,7 @@ textarea::placeholder { color: var(--muted); }
   </div>
 </div>
 
-<button class="report-btn" onclick="showReport()" style="max-width:1368px; margin-left:auto; margin-right:auto; display:block; padding-left:16px; padding-right:16px;">📝 生成每日综合报告</button>
+<button class="report-btn" onclick="showReport()">📝 生成每日综合报告</button>
 
 <div class="report-modal" id="reportModal" onclick="if(event.target===this)closeReport()">
   <div class="report-card">
@@ -216,92 +236,88 @@ textarea::placeholder { color: var(--muted); }
 </div>
 
 <script>
-// ── Storage ──
 const KEYS = { work: 'hub_work', learn: 'hub_learn', train: 'hub_train' };
 function load(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
 function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
-// ── Date ──
 let curDate = new Date();
 const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
 function ds(d) { return d.toISOString().split('T')[0]; }
 function fmtDate(d) {
-  const m = d.getMonth()+1, day = d.getDate(), w = weekdays[d.getDay()];
-  const today = ds(new Date()), s = ds(d);
-  const prefix = s===today ? '今天 · ' : s===ds(new Date(Date.now()-864e5)) ? '昨天 · ' : '';
+  const m=d.getMonth()+1, day=d.getDate(), w=weekdays[d.getDay()];
+  const today=ds(new Date()), s=ds(d);
+  const prefix = s===today?'今天 · ':s===ds(new Date(Date.now()-864e5))?'昨天 · ':'';
   return `${prefix}${m}.${day} ${w}`;
 }
-function shortDate(d) {
-  const m = d.getMonth()+1, day = d.getDate(), w = weekdays[d.getDay()];
-  return `${m}.${day} ${w}`;
-}
-function changeDate(delta) { curDate = new Date(curDate.getTime() + delta*864e5); render(); }
-function goToday() { curDate = new Date(); render(); }
+function shortDate(d) { return `${d.getMonth()+1}.${d.getDate()} ${weekdays[d.getDay()]}`; }
+function changeDate(delta) { curDate=new Date(curDate.getTime()+delta*864e5); render(); }
+function goToday() { curDate=new Date(); render(); }
 function nowTime() { return new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}); }
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ── Work ──
-function addWork() {
-  const el = document.getElementById('workInput');
+// ── Work: two input areas ──
+function addWorkDone() {
+  const el = document.getElementById('workDoneInput');
   const text = el.value.trim(); if(!text) return;
-  const entries = load(KEYS.work);
-  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
-  const dateStr = ds(curDate);
-  lines.forEach((line,i) => {
+  const entries = load(KEYS.work), dateStr = ds(curDate), time = nowTime();
+  text.split('\n').map(l=>l.trim()).filter(Boolean).forEach((line,i)=>{
     entries.push({
       id: Date.now().toString(36)+Math.random().toString(36).slice(2,5)+i,
       content: line.replace(/^[-·•\d.、\s]+/,''),
-      done: false, date: dateStr, time: nowTime(), doneTime: null
+      done: true, date: dateStr, time: time, doneTime: time
     });
   });
   save(KEYS.work, entries); el.value=''; render();
 }
+
+function addWorkTodo() {
+  const el = document.getElementById('workTodoInput');
+  const text = el.value.trim(); if(!text) return;
+  const entries = load(KEYS.work), dateStr = ds(curDate), time = nowTime();
+  text.split('\n').map(l=>l.trim()).filter(Boolean).forEach((line,i)=>{
+    entries.push({
+      id: Date.now().toString(36)+Math.random().toString(36).slice(2,5)+i,
+      content: line.replace(/^[-·•\d.、\s]+/,''),
+      done: false, date: dateStr, time: time, doneTime: null
+    });
+  });
+  save(KEYS.work, entries); el.value=''; render();
+}
+
 function toggleWork(id) {
-  const entries = load(KEYS.work);
-  const e = entries.find(x=>x.id===id);
+  const entries = load(KEYS.work), e = entries.find(x=>x.id===id);
   if(e){ e.done=!e.done; e.doneTime=e.done?nowTime():null; save(KEYS.work,entries); render(); }
 }
 function delWork(id) { save(KEYS.work, load(KEYS.work).filter(x=>x.id!==id)); render(); }
 
 function getWorkForDate(dateStr) {
-  return load(KEYS.work).filter(e=>e.date===dateStr).sort((a,b)=>{
-    if(a.done!==b.done) return a.done?1:-1; return 0;
-  });
+  return load(KEYS.work).filter(e=>e.date===dateStr).sort((a,b)=>{ if(a.done!==b.done) return a.done?1:-1; return 0; });
 }
 
 function genWorkSummary() {
-  const dateStr = ds(curDate);
-  const items = getWorkForDate(dateStr);
+  const dateStr=ds(curDate), items=getWorkForDate(dateStr);
   if(!items.length){ alert('当天没有工作记录'); return; }
-  const done = items.filter(e=>e.done), undone = items.filter(e=>!e.done);
-  const d = shortDate(curDate);
-  let s = `【工作日报 - ${d}】\n\n`;
+  const done=items.filter(e=>e.done), undone=items.filter(e=>!e.done), d=shortDate(curDate);
+  let s=`【工作日报 - ${d}】\n\n`;
   if(done.length){ s+=`一、今日完成工作：\n`; done.forEach(e=>{s+=`  ✅ ${e.content}\n`;}); s+='\n'; }
   if(undone.length){ s+=`二、未完成事项：\n`; undone.forEach(e=>{s+=`  ⏳ ${e.content}\n`;}); s+='\n'; }
-  const total=items.length, doneN=done.length;
-  s+=`三、总结：\n  今天是${d}，已完成：${done.map(e=>e.content).join('、')||'无'}；未完成：${undone.map(e=>e.content).join('、')||'无'}。\n  完成率 ${Math.round(doneN/total*100)}%（${doneN}/${total}）`;
-  const summaries = JSON.parse(localStorage.getItem('hub_work_summary')||'{}');
-  summaries[dateStr] = s; localStorage.setItem('hub_work_summary', JSON.stringify(summaries));
-  render();
+  s+=`三、总结：\n  今天是${d}，已完成：${done.map(e=>e.content).join('、')||'无'}；未完成：${undone.map(e=>e.content).join('、')||'无'}。\n  完成率 ${Math.round(done.length/items.length*100)}%（${done.length}/${items.length}）`;
+  const summaries=JSON.parse(localStorage.getItem('hub_work_summary')||'{}');
+  summaries[dateStr]=s; localStorage.setItem('hub_work_summary',JSON.stringify(summaries)); render();
 }
 
 // ── Learn ──
 function addLearn() {
-  const el = document.getElementById('learnInput');
-  const text = el.value.trim(); if(!text) return;
-  const entries = load(KEYS.learn);
-  entries.push({
-    id: Date.now().toString(36)+Math.random().toString(36).slice(2,5),
-    content: text, date: ds(curDate), time: nowTime(),
-    keywords: extractKW(text)
-  });
-  save(KEYS.learn, entries); el.value=''; render();
+  const el=document.getElementById('learnInput'), text=el.value.trim(); if(!text) return;
+  const entries=load(KEYS.learn);
+  entries.push({ id:Date.now().toString(36)+Math.random().toString(36).slice(2,5), content:text, date:ds(curDate), time:nowTime(), keywords:extractKW(text) });
+  save(KEYS.learn,entries); el.value=''; render();
 }
-function delLearn(id) { save(KEYS.learn, load(KEYS.learn).filter(x=>x.id!==id)); render(); }
+function delLearn(id) { save(KEYS.learn,load(KEYS.learn).filter(x=>x.id!==id)); render(); }
 
 function extractKW(text) {
-  const stops = new Set('的了在是我和与对到上下中有个这那做进行完成今天工作内容一个已经需要可以关于还学习主要包括使用一些重点方面通过'.split(''));
-  // simple: split by punctuation, filter
-  const words = text.replace(/[，。！？、；：""''（）\[\]{}.,!?;:'"()\s\n]+/g,' ').split(' ').filter(w=>w.length>=2&&!stops.has(w));
+  const stops=new Set('的了在是我和与对到上下中有个这那做进行完成今天工作内容一个已经需要可以关于还学习主要包括使用一些重点方面通过'.split(''));
+  const words=text.replace(/[，。！？、；：""''（）\[\]{}.,!?;:'"()\s\n]+/g,' ').split(' ').filter(w=>w.length>=2&&!stops.has(w));
   const freq={}; words.forEach(w=>{freq[w]=(freq[w]||0)+1;});
   return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
 }
@@ -309,220 +325,163 @@ function extractKW(text) {
 function getLearnForDate(dateStr) { return load(KEYS.learn).filter(e=>e.date===dateStr); }
 
 function genLearnSummary() {
-  const dateStr = ds(curDate);
-  const items = getLearnForDate(dateStr);
+  const dateStr=ds(curDate), items=getLearnForDate(dateStr);
   if(!items.length){ alert('当天没有学习记录'); return; }
-  const allKW = []; items.forEach(e=> allKW.push(...(e.keywords||[])));
-  const uniqKW = [...new Set(allKW)].slice(0,6);
-  const d = shortDate(curDate);
-  const topics = uniqKW.slice(0,3).join('、') || '多项内容';
-  let s = `【学习日报 - ${d}】\n\n`;
-  s += `📖 学习记录（${items.length}条）\n`;
-  items.forEach((e,i)=>{s+=`  ${i+1}. ${e.content.slice(0,60)}${e.content.length>60?'...':''}\n`;});
-  s += `\n🏷️ 关键词：${uniqKW.join('、')||'无'}\n\n`;
-  s += `📝 总结：\n  今日主要学习${topics}，共记录${items.length}条学习内容，对相关方向进行了进一步深化学习。`;
-  const summaries = JSON.parse(localStorage.getItem('hub_learn_summary')||'{}');
-  summaries[dateStr] = s; localStorage.setItem('hub_learn_summary', JSON.stringify(summaries));
-  render();
+  const allKW=[]; items.forEach(e=>allKW.push(...(e.keywords||[])));
+  const uniqKW=[...new Set(allKW)].slice(0,6), d=shortDate(curDate), topics=uniqKW.slice(0,3).join('、')||'多项内容';
+  let s=`【学习日报 - ${d}】\n\n📖 学习记录（${items.length}条）\n`;
+  items.forEach((e,i)=>{s+=`  ${i+1}. ${e.content}\n`;});
+  s+=`\n🏷️ 关键词：${uniqKW.join('、')||'无'}\n\n📝 总结：\n  今日主要学习${topics}，共记录${items.length}条学习内容，对相关方向进行了进一步深化学习。`;
+  const summaries=JSON.parse(localStorage.getItem('hub_learn_summary')||'{}');
+  summaries[dateStr]=s; localStorage.setItem('hub_learn_summary',JSON.stringify(summaries)); render();
 }
 
 // ── Train ──
-const STRENGTH = ['胸','肩','背','腿','腹肌','二头','三头'];
-const CARDIO = ['有氧','跑步','游泳','跳绳','骑行'];
-const MUSCLE_MAP = { '胸':'胸部','肩':'肩部','背':'背部','腿':'腿部','腹肌':'核心','二头':'手臂','三头':'手臂','有氧':'心肺','跑步':'心肺','游泳':'全身','跳绳':'心肺','骑行':'心肺' };
-let selectedTrain = new Set();
+const STRENGTH=['胸','肩','背','腿','腹肌','二头','三头'];
+const CARDIO=['有氧','跑步','游泳','跳绳','骑行'];
+const MUSCLE_MAP={'胸':'胸部','肩':'肩部','背':'背部','腿':'腿部','腹肌':'核心','二头':'手臂','三头':'手臂','有氧':'心肺','跑步':'心肺','游泳':'全身','跳绳':'心肺','骑行':'心肺'};
+let selectedTrain=new Set();
 
 function initChips() {
-  const sc = document.getElementById('strengthChips');
-  const cc = document.getElementById('cardioChips');
-  sc.innerHTML = STRENGTH.map(s=>`<div class="chip chip-strength" data-name="${s}" onclick="toggleChip(this,'${s}')">${s}</div>`).join('');
-  cc.innerHTML = CARDIO.map(s=>`<div class="chip chip-cardio" data-name="${s}" onclick="toggleChip(this,'${s}')">${s}</div>`).join('');
+  document.getElementById('strengthChips').innerHTML=STRENGTH.map(s=>`<div class="chip chip-strength" onclick="toggleChip(this,'${s}')">${s}</div>`).join('');
+  document.getElementById('cardioChips').innerHTML=CARDIO.map(s=>`<div class="chip chip-cardio" onclick="toggleChip(this,'${s}')">${s}</div>`).join('');
 }
-function toggleChip(el, name) {
-  if(selectedTrain.has(name)){ selectedTrain.delete(name); el.classList.remove('active'); }
-  else{ selectedTrain.add(name); el.classList.add('active'); }
+function toggleChip(el,name) {
+  if(selectedTrain.has(name)){selectedTrain.delete(name);el.classList.remove('active');}
+  else{selectedTrain.add(name);el.classList.add('active');}
 }
 function addTrain() {
   if(!selectedTrain.size) return;
-  const entries = load(KEYS.train);
-  const items = [...selectedTrain];
-  const strength = items.filter(i=>STRENGTH.includes(i));
-  const cardio = items.filter(i=>CARDIO.includes(i));
-  const n = items.length;
-  const intensity = n<=2?'低':n<=4?'中':'高';
-  entries.push({
-    id: Date.now().toString(36)+Math.random().toString(36).slice(2,5),
-    items, strength, cardio, intensity, date: ds(curDate), time: nowTime()
-  });
-  save(KEYS.train, entries);
-  selectedTrain.clear();
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  render();
+  const entries=load(KEYS.train), items=[...selectedTrain];
+  const strength=items.filter(i=>STRENGTH.includes(i)), cardio=items.filter(i=>CARDIO.includes(i));
+  const intensity=items.length<=2?'低':items.length<=4?'中':'高';
+  entries.push({ id:Date.now().toString(36)+Math.random().toString(36).slice(2,5), items,strength,cardio,intensity, date:ds(curDate), time:nowTime() });
+  save(KEYS.train,entries); selectedTrain.clear();
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); render();
 }
-function delTrain(id) { save(KEYS.train, load(KEYS.train).filter(x=>x.id!==id)); render(); }
-
+function delTrain(id) { save(KEYS.train,load(KEYS.train).filter(x=>x.id!==id)); render(); }
 function getTrainForDate(dateStr) { return load(KEYS.train).filter(e=>e.date===dateStr); }
 
 function genTrainSummary() {
-  const dateStr = ds(curDate);
-  const items = getTrainForDate(dateStr);
+  const dateStr=ds(curDate), items=getTrainForDate(dateStr);
   if(!items.length){ alert('当天没有训练记录'); return; }
-  const d = shortDate(curDate);
-  const allItems = []; items.forEach(e=>allItems.push(...e.items));
-  const uniq = [...new Set(allItems)];
-  const muscles = [...new Set(uniq.map(i=>MUSCLE_MAP[i]||i))];
-  const n = uniq.length;
-  const intensity = n<=2?'低':n<=4?'中':'高';
-  let s = `【训练日报 - ${d}】\n\n`;
-  s += `🏋️ 训练项目：${uniq.join('、')}\n`;
-  s += `💪 锻炼肌群：${muscles.join('、')}\n`;
-  s += `🔥 训练强度：${intensity}等\n\n`;
-  s += `📝 总结：\n  今日进行了${uniq.join('、')}训练，重点锻炼${muscles.join('与')}，整体训练强度${intensity}等。`;
-  const summaries = JSON.parse(localStorage.getItem('hub_train_summary')||'{}');
-  summaries[dateStr] = s; localStorage.setItem('hub_train_summary', JSON.stringify(summaries));
-  render();
+  const d=shortDate(curDate), allItems=[]; items.forEach(e=>allItems.push(...e.items));
+  const uniq=[...new Set(allItems)], muscles=[...new Set(uniq.map(i=>MUSCLE_MAP[i]||i))];
+  const intensity=uniq.length<=2?'低':uniq.length<=4?'中':'高';
+  let s=`【训练日报 - ${d}】\n\n🏋️ 训练项目：${uniq.join('、')}\n💪 锻炼肌群：${muscles.join('、')}\n🔥 训练强度：${intensity}等\n\n📝 总结：\n  今日进行了${uniq.join('、')}训练，重点锻炼${muscles.join('与')}，整体训练强度${intensity}等。`;
+  const summaries=JSON.parse(localStorage.getItem('hub_train_summary')||'{}');
+  summaries[dateStr]=s; localStorage.setItem('hub_train_summary',JSON.stringify(summaries)); render();
 }
 
 // ── Report ──
 function showReport() {
-  const dateStr = ds(curDate);
-  const d = shortDate(curDate);
-  const ws = JSON.parse(localStorage.getItem('hub_work_summary')||'{}')[dateStr];
-  const ls = JSON.parse(localStorage.getItem('hub_learn_summary')||'{}')[dateStr];
-  const ts = JSON.parse(localStorage.getItem('hub_train_summary')||'{}')[dateStr];
+  const dateStr=ds(curDate), d=shortDate(curDate);
+  const ws=JSON.parse(localStorage.getItem('hub_work_summary')||'{}')[dateStr];
+  const ls=JSON.parse(localStorage.getItem('hub_learn_summary')||'{}')[dateStr];
+  const ts=JSON.parse(localStorage.getItem('hub_train_summary')||'{}')[dateStr];
   if(!ws&&!ls&&!ts){ alert('请先在各模块生成总结'); return; }
-  let r = `【每日综合报告 - ${d}】\n${'═'.repeat(30)}\n\n`;
-  if(ws) r += ws + '\n\n' + '─'.repeat(30) + '\n\n';
-  if(ls) r += ls + '\n\n' + '─'.repeat(30) + '\n\n';
-  if(ts) r += ts + '\n';
-  document.getElementById('reportTitle').textContent = `📝 每日综合报告 · ${d}`;
-  document.getElementById('reportContent').textContent = r;
+  let r=`【每日综合报告 - ${d}】\n${'═'.repeat(30)}\n\n`;
+  if(ws) r+=ws+'\n\n'+'─'.repeat(30)+'\n\n';
+  if(ls) r+=ls+'\n\n'+'─'.repeat(30)+'\n\n';
+  if(ts) r+=ts+'\n';
+  document.getElementById('reportTitle').textContent=`📝 每日综合报告 · ${d}`;
+  document.getElementById('reportContent').textContent=r;
   document.getElementById('reportModal').classList.add('show');
-  window._reportText = r;
+  window._reportText=r;
 }
 function closeReport() { document.getElementById('reportModal').classList.remove('show'); }
 function copyReport() {
   navigator.clipboard.writeText(window._reportText||'').then(()=>{
-    const btn = document.querySelector('.report-actions .btn-outline');
+    const btn=document.querySelector('.report-actions .btn-outline');
     btn.textContent='✅ 已复制'; setTimeout(()=>{btn.textContent='📋 复制';},1500);
   });
 }
 
 // ── Render ──
-function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
 function render() {
-  document.getElementById('dateLabel').textContent = fmtDate(curDate);
-  const dateStr = ds(curDate);
+  document.getElementById('dateLabel').textContent=fmtDate(curDate);
+  const dateStr=ds(curDate);
 
-  // Work
-  const workItems = getWorkForDate(dateStr);
-  const wDone = workItems.filter(e=>e.done), wUndone = workItems.filter(e=>!e.done);
-  document.getElementById('workBadge').textContent = `${workItems.length} 项`;
+  const workItems=getWorkForDate(dateStr);
+  const wDone=workItems.filter(e=>e.done), wUndone=workItems.filter(e=>!e.done);
+  document.getElementById('workBadge').textContent=`${workItems.length} 项`;
 
-  let wHTML = '';
+  let wHTML='';
   if(workItems.length) {
-    const pct = workItems.length ? Math.round(wDone.length/workItems.length*100) : 0;
-    wHTML += `<div class="progress-wrap">
-      <div class="progress-info"><span>任务进度</span><span>${wDone.length}/${workItems.length} (${pct}%)</span></div>
-      <div class="progress-bar"><div class="progress-fill fill-blue" style="width:${pct}%"></div></div>
-    </div>`;
+    const pct=Math.round(wDone.length/workItems.length*100);
+    wHTML+=`<div class="progress-wrap"><div class="progress-info"><span>任务进度</span><span>${wDone.length}/${workItems.length} (${pct}%)</span></div><div class="progress-bar"><div class="progress-fill fill-blue" style="width:${pct}%"></div></div></div>`;
     if(wUndone.length) {
-      wHTML += `<div class="section-label">⏳ 进行中</div><ul class="task-list">`;
-      wUndone.forEach(e => {
-        wHTML += `<li class="task-item"><button class="task-cb" onclick="toggleWork('${e.id}')"></button><span class="task-text">${esc(e.content)}</span><button class="task-del" onclick="delWork('${e.id}')">✕</button></li>`;
+      wHTML+=`<div class="section-label">📌 待办事项（${wUndone.length}）</div><ul class="task-list">`;
+      wUndone.forEach(e=>{
+        wHTML+=`<li class="task-item"><button class="task-cb" onclick="toggleWork('${e.id}')"></button><div style="flex:1"><span class="task-text">${esc(e.content)}</span><div class="task-time">${e.time} 添加</div></div><button class="task-del" onclick="delWork('${e.id}')">✕</button></li>`;
       });
-      wHTML += '</ul>';
+      wHTML+='</ul>';
     }
     if(wDone.length) {
-      wHTML += `<div class="section-label">✅ 已完成</div><ul class="task-list">`;
-      wDone.forEach(e => {
-        wHTML += `<li class="task-item done"><button class="task-cb checked" onclick="toggleWork('${e.id}')"></button><span class="task-text">${esc(e.content)}</span><button class="task-del" onclick="delWork('${e.id}')">✕</button></li>`;
+      wHTML+=`<div class="section-label">✅ 已完成（${wDone.length}）</div><ul class="task-list">`;
+      wDone.forEach(e=>{
+        wHTML+=`<li class="task-item done"><button class="task-cb checked" onclick="toggleWork('${e.id}')"></button><div style="flex:1"><span class="task-text">${esc(e.content)}</span><div class="task-time">${e.doneTime||e.time} 完成</div></div><button class="task-del" onclick="delWork('${e.id}')">✕</button></li>`;
       });
-      wHTML += '</ul>';
+      wHTML+='</ul>';
     }
   } else {
-    wHTML = '<div class="empty">暂无任务，开始规划今天的工作 ✍️</div>';
+    wHTML='<div class="empty">暂无任务，开始规划今天的工作 ✍️</div>';
   }
-  document.getElementById('workList').innerHTML = wHTML;
+  document.getElementById('workList').innerHTML=wHTML;
+  document.getElementById('workProgress').innerHTML='';
 
-  const wSummary = JSON.parse(localStorage.getItem('hub_work_summary')||'{}')[dateStr];
-  document.getElementById('workSummary').innerHTML = wSummary ?
-    `<div class="summary-box"><h4>📊 工作总结</h4><div class="s-content">${esc(wSummary)}</div></div>` : '';
-  document.getElementById('workProgress').innerHTML = '';
+  const wSummary=JSON.parse(localStorage.getItem('hub_work_summary')||'{}')[dateStr];
+  document.getElementById('workSummary').innerHTML=wSummary?`<div class="summary-box"><h4>📊 工作总结</h4><div class="s-content">${esc(wSummary)}</div></div>`:'';
 
-  // Learn
-  const learnItems = getLearnForDate(dateStr);
-  document.getElementById('learnBadge').textContent = `${learnItems.length} 条`;
-  let lHTML = '';
+  const learnItems=getLearnForDate(dateStr);
+  document.getElementById('learnBadge').textContent=`${learnItems.length} 条`;
+  let lHTML='';
   if(learnItems.length) {
-    learnItems.forEach(e => {
-      lHTML += `<div class="learn-entry"><div class="le-time">🕐 ${e.time}</div><div class="le-text">${esc(e.content)}</div>`;
-      if(e.keywords && e.keywords.length) {
-        lHTML += `<div class="learn-keywords">${e.keywords.map(k=>`<span class="kw-tag">${esc(k)}</span>`).join('')}</div>`;
-      }
-      lHTML += `<button class="task-del" style="position:absolute;top:8px;right:8px;opacity:0" onclick="delLearn('${e.id}')">✕</button></div>`;
+    learnItems.forEach(e=>{
+      lHTML+=`<div class="learn-entry"><div class="le-time">🕐 ${e.time}</div><div class="le-text">${esc(e.content)}</div>`;
+      if(e.keywords&&e.keywords.length) lHTML+=`<div class="learn-keywords">${e.keywords.map(k=>`<span class="kw-tag">${esc(k)}</span>`).join('')}</div>`;
+      lHTML+=`<button class="task-del" style="position:absolute;top:8px;right:8px;opacity:0" onclick="delLearn('${e.id}')">✕</button></div>`;
     });
   } else {
-    lHTML = '<div class="empty">记录今天学到的新知识 📖</div>';
+    lHTML='<div class="empty">记录今天学到的新知识 📖</div>';
   }
-  document.getElementById('learnList').innerHTML = lHTML;
-  // fix hover for learn entries
+  document.getElementById('learnList').innerHTML=lHTML;
   document.querySelectorAll('.learn-entry').forEach(el=>{
-    el.style.position='relative';
     el.addEventListener('mouseenter',()=>{const d=el.querySelector('.task-del');if(d)d.style.opacity='1';});
     el.addEventListener('mouseleave',()=>{const d=el.querySelector('.task-del');if(d)d.style.opacity='0';});
   });
 
-  const lSummary = JSON.parse(localStorage.getItem('hub_learn_summary')||'{}')[dateStr];
-  document.getElementById('learnSummary').innerHTML = lSummary ?
-    `<div class="summary-box learn"><h4>📊 学习总结</h4><div class="s-content">${esc(lSummary)}</div></div>` : '';
+  const lSummary=JSON.parse(localStorage.getItem('hub_learn_summary')||'{}')[dateStr];
+  document.getElementById('learnSummary').innerHTML=lSummary?`<div class="summary-box learn"><h4>📊 学习总结</h4><div class="s-content">${esc(lSummary)}</div></div>`:'';
 
-  // Train
-  const trainItems = getTrainForDate(dateStr);
-  const totalTrainItems = new Set(); trainItems.forEach(e=>e.items.forEach(i=>totalTrainItems.add(i)));
-  document.getElementById('trainBadge').textContent = trainItems.length ? `${totalTrainItems.size} 项` : '未训练';
-
-  let tHTML = '';
+  const trainItems=getTrainForDate(dateStr);
+  const totalTI=new Set(); trainItems.forEach(e=>e.items.forEach(i=>totalTI.add(i)));
+  document.getElementById('trainBadge').textContent=trainItems.length?`${totalTI.size} 项`:'未训练';
+  let tHTML='';
   if(trainItems.length) {
-    trainItems.forEach(e => {
-      tHTML += `<div class="train-log" style="position:relative">
-        <div class="tl-items">
-          ${e.strength.map(s=>`<span class="tl-tag tl-strength">${s}</span>`).join('')}
-          ${e.cardio.map(s=>`<span class="tl-tag tl-cardio">${s}</span>`).join('')}
-        </div>
-        <div class="tl-time">🕐 ${e.time}</div>
-        <div class="intensity int-${e.intensity==='低'?'low':e.intensity==='中'?'mid':'high'}">🔥 强度：${e.intensity}等</div>
-        <button class="task-del" style="position:absolute;top:8px;right:8px;opacity:0" onclick="delTrain('${e.id}')">✕</button>
-      </div>`;
+    trainItems.forEach(e=>{
+      tHTML+=`<div class="train-log"><div class="tl-items">${e.strength.map(s=>`<span class="tl-tag tl-strength">${s}</span>`).join('')}${e.cardio.map(s=>`<span class="tl-tag tl-cardio">${s}</span>`).join('')}</div><div class="tl-time">🕐 ${e.time}</div><div class="intensity int-${e.intensity==='低'?'low':e.intensity==='中'?'mid':'high'}">🔥 强度：${e.intensity}等</div><button class="task-del" style="position:absolute;top:8px;right:8px;opacity:0" onclick="delTrain('${e.id}')">✕</button></div>`;
     });
   } else {
-    tHTML = '<div class="empty">选择训练项目开始记录 💪</div>';
+    tHTML='<div class="empty">选择训练项目开始记录 💪</div>';
   }
-  document.getElementById('trainList').innerHTML = tHTML;
+  document.getElementById('trainList').innerHTML=tHTML;
   document.querySelectorAll('.train-log').forEach(el=>{
     el.addEventListener('mouseenter',()=>{const d=el.querySelector('.task-del');if(d)d.style.opacity='1';});
     el.addEventListener('mouseleave',()=>{const d=el.querySelector('.task-del');if(d)d.style.opacity='0';});
   });
 
-  const tSummary = JSON.parse(localStorage.getItem('hub_train_summary')||'{}')[dateStr];
-  document.getElementById('trainSummary').innerHTML = tSummary ?
-    `<div class="summary-box train"><h4>📊 训练总结</h4><div class="s-content">${esc(tSummary)}</div></div>` : '';
+  const tSummary=JSON.parse(localStorage.getItem('hub_train_summary')||'{}')[dateStr];
+  document.getElementById('trainSummary').innerHTML=tSummary?`<div class="summary-box train"><h4>📊 训练总结</h4><div class="s-content">${esc(tSummary)}</div></div>`:'';
 }
 
 initChips();
 render();
 
-// Keyboard shortcuts
-document.getElementById('workInput').addEventListener('keydown', e => {
-  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); addWork(); }
-});
-document.getElementById('learnInput').addEventListener('keydown', e => {
-  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){ e.preventDefault(); addLearn(); }
-});
-document.addEventListener('keydown', e => {
-  if(e.key==='Escape') closeReport();
-});
+document.getElementById('workDoneInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();addWorkDone();}});
+document.getElementById('workTodoInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();addWorkTodo();}});
+document.getElementById('learnInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();addLearn();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeReport();});
 </script>
 </body>
 </html>
