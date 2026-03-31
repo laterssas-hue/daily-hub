@@ -6,10 +6,10 @@
 <title>每日三合一 · 工作 / 学习 / 训练</title>
 <style>
 :root {
-  --bg: #0a0a0f; --card: #12121a; --border: #1e1e2e; --hover: #1a1a2a;
-  --text: #e0e0e0; --muted: #666; --sub: #999;
-  --accent: #6c9eff; --green: #4ade80; --orange: #fb923c; --red: #f87171;
-  --purple: #a78bfa; --pink: #f472b6; --cyan: #22d3ee;
+  --bg: #f5f5f7; --card: #ffffff; --border: #e0e0e0; --hover: #f0f0f5;
+  --text: #1a1a1a; --muted: #999; --sub: #555;
+  --accent: #4a7eff; --green: #22c55e; --orange: #f59e0b; --red: #ef4444;
+  --purple: #8b5cf6; --pink: #ec4899; --cyan: #06b6d4;
   --radius: 14px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -62,7 +62,7 @@ textarea::placeholder { color: var(--muted); }
 .task-cb { width: 20px; height: 20px; min-width: 20px; border-radius: 50%; border: 2px solid var(--accent); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; margin-top: 2px; }
 .task-cb:hover { background: rgba(108,158,255,.1); }
 .task-cb.checked { border-color: var(--green); background: var(--green); }
-.task-cb.checked::after { content: '✓'; color: #000; font-size: 11px; font-weight: 700; }
+.task-cb.checked::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 700; }
 .task-item.done .task-text { text-decoration: line-through; color: var(--muted); }
 .task-text { flex: 1; font-size: 0.85rem; line-height: 1.5; }
 .task-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.75rem; opacity: 0; transition: opacity .2s; }
@@ -85,7 +85,7 @@ textarea::placeholder { color: var(--muted); }
 .chip-cardio.active { background: var(--cyan); border-color: var(--cyan); color: #000; }
 
 /* Summary */
-.summary-box { background: linear-gradient(135deg, rgba(108,158,255,.05), rgba(167,139,250,.05)); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.summary-box { background: linear-gradient(135deg, rgba(74,126,255,.06), rgba(139,92,246,.06)); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
 .summary-box h4 { font-size: 0.8rem; color: var(--accent); margin-bottom: 8px; font-weight: 700; }
 .summary-box.learn h4 { color: var(--purple); }
 .summary-box.train h4 { color: var(--pink); }
