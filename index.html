@@ -129,6 +129,8 @@ textarea::placeholder { color: var(--muted); }
 .report-card pre { font-family: inherit; white-space: pre-wrap; word-break: break-word; font-size: 0.88rem; line-height: 1.8; color: var(--sub); }
 .report-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
 
+.view-btn { min-width: 32px; padding: 4px 10px !important; }
+
 .empty { text-align: center; padding: 24px; color: var(--muted); font-size: 0.82rem; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -145,6 +147,21 @@ textarea::placeholder { color: var(--muted); }
   <span class="date-text" id="dateLabel"></span>
   <button onclick="changeDate(1)">›</button>
   <button class="today-btn" onclick="goToday()">今天</button>
+  <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
+  <button class="today-btn view-btn" id="btnDay" style="background:var(--accent)" onclick="setView('day')">日</button>
+  <button class="today-btn view-btn" id="btnWeek" style="background:var(--border);color:var(--sub)" onclick="setView('week')">周</button>
+  <button class="today-btn view-btn" id="btnMonth" style="background:var(--border);color:var(--sub)" onclick="setView('month')">月</button>
+</div>
+
+<div id="summaryPanel" style="display:none;max-width:1400px;margin:0 auto 24px;padding:0 16px;">
+  <div class="module" style="max-height:none">
+    <div class="module-header">
+      <span class="icon" id="sumIcon">📅</span>
+      <h2 id="sumTitle">周汇总</h2>
+      <span class="badge badge-work" id="sumBadge"></span>
+    </div>
+    <div class="module-body" id="sumBody" style="max-height:70vh;overflow-y:auto"></div>
+  </div>
 </div>
 
 <div class="grid">
@@ -250,8 +267,14 @@ function fmtDate(d) {
   return `${prefix}${m}.${day} ${w}`;
 }
 function shortDate(d) { return `${d.getMonth()+1}.${d.getDate()} ${weekdays[d.getDay()]}`; }
-function changeDate(delta) { curDate=new Date(curDate.getTime()+delta*864e5); render(); }
-function goToday() { curDate=new Date(); render(); }
+function changeDate(delta) {
+  if(curView==='day') curDate=new Date(curDate.getTime()+delta*864e5);
+  else if(curView==='week') curDate=new Date(curDate.getTime()+delta*7*864e5);
+  else { curDate.setMonth(curDate.getMonth()+delta); }
+  render();
+  if(curView!=='day') renderSummary(curView);
+}
+function goToday() { curDate=new Date(); render(); if(curView!=='day') renderSummary(curView); }
 function nowTime() { return new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}); }
 function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
@@ -491,6 +514,136 @@ function render() {
 
   const tSummary=JSON.parse(localStorage.getItem('hub_train_summary')||'{}')[dateStr];
   document.getElementById('trainSummary').innerHTML=tSummary?`<div class="summary-box train"><h4>📊 训练总结</h4><div class="s-content">${esc(tSummary)}</div></div>`:'';
+}
+
+// ── View switching (day/week/month) ──
+let curView = 'day';
+function setView(v) {
+  curView = v;
+  ['day','week','month'].forEach(k=>{
+    const b=document.getElementById('btn'+k.charAt(0).toUpperCase()+k.slice(1));
+    if(k===v){b.style.background='var(--accent)';b.style.color='#fff';}
+    else{b.style.background='var(--border)';b.style.color='var(--sub)';}
+  });
+  if(v==='day'){
+    document.querySelector('.grid').style.display='';
+    document.querySelector('.report-btn').style.display='';
+    document.getElementById('summaryPanel').style.display='none';
+  } else {
+    document.querySelector('.grid').style.display='none';
+    document.querySelector('.report-btn').style.display='none';
+    document.getElementById('summaryPanel').style.display='block';
+    renderSummary(v);
+  }
+}
+
+function getDateRange(view) {
+  const d = new Date(curDate);
+  if(view==='week'){
+    const day=d.getDay()||7; // Monday=1
+    const mon=new Date(d); mon.setDate(d.getDate()-(day-1));
+    const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+    const dates=[];
+    for(let i=0;i<7;i++){const x=new Date(mon);x.setDate(mon.getDate()+i);dates.push(ds(x));}
+    return {dates, label:`${mon.getMonth()+1}.${mon.getDate()} - ${sun.getMonth()+1}.${sun.getDate()} 本周`};
+  } else {
+    const y=d.getFullYear(), m=d.getMonth();
+    const first=new Date(y,m,1), last=new Date(y,m+1,0);
+    const dates=[];
+    for(let i=1;i<=last.getDate();i++) dates.push(ds(new Date(y,m,i)));
+    return {dates, label:`${y}年${m+1}月`};
+  }
+}
+
+function renderSummary(view) {
+  const {dates, label} = getDateRange(view);
+  const allWork=load(KEYS.work).filter(e=>dates.includes(e.date));
+  const allLearn=load(KEYS.learn).filter(e=>dates.includes(e.date));
+  const allTrain=load(KEYS.train).filter(e=>dates.includes(e.date));
+
+  document.getElementById('sumTitle').textContent= view==='week'?'周汇总':'月汇总';
+  document.getElementById('sumIcon').textContent= view==='week'?'📅':'🗓️';
+  document.getElementById('sumBadge').textContent=label;
+
+  const wDone=allWork.filter(e=>e.done), wUndone=allWork.filter(e=>!e.done);
+  let html='';
+
+  // Work summary
+  html+=`<div class="section-label" style="font-size:0.9rem;font-weight:700">💼 工作（共 ${allWork.length} 项，完成 ${wDone.length}，待办 ${wUndone.length}）</div>`;
+  if(wDone.length){
+    html+=`<div class="section-label">✅ 已完成（${wDone.length}）</div><ul class="task-list">`;
+    // Group by date
+    const byDate={};
+    wDone.forEach(e=>{(byDate[e.date]=byDate[e.date]||[]).push(e);});
+    Object.keys(byDate).sort().forEach(d=>{
+      const dd=new Date(d);
+      html+=`<li style="font-size:0.75rem;color:var(--muted);padding:6px 0 2px;font-weight:600">${dd.getMonth()+1}.${dd.getDate()} ${weekdays[dd.getDay()]}</li>`;
+      byDate[d].forEach(e=>{
+        html+=`<li class="task-item done"><button class="task-cb checked"></button><span class="task-text">${esc(e.content)}</span></li>`;
+      });
+    });
+    html+='</ul>';
+  }
+  if(wUndone.length){
+    html+=`<div class="section-label" style="margin-top:10px">⏳ 未完成（${wUndone.length}）</div><ul class="task-list">`;
+    wUndone.forEach(e=>{
+      html+=`<li class="task-item"><button class="task-cb"></button><span class="task-text">${esc(e.content)}</span><span class="task-time" style="margin-left:auto">${e.date.slice(5)}</span></li>`;
+    });
+    html+='</ul>';
+  }
+  if(!allWork.length) html+=`<div class="empty">该时段无工作记录</div>`;
+
+  // Learn summary
+  html+=`<div style="height:20px"></div><div class="section-label" style="font-size:0.9rem;font-weight:700">📚 学习（共 ${allLearn.length} 条）</div>`;
+  if(allLearn.length){
+    const byDate={};
+    allLearn.forEach(e=>{(byDate[e.date]=byDate[e.date]||[]).push(e);});
+    Object.keys(byDate).sort().forEach(d=>{
+      const dd=new Date(d);
+      html+=`<div class="section-label" style="margin-top:8px">${dd.getMonth()+1}.${dd.getDate()} ${weekdays[dd.getDay()]}</div>`;
+      byDate[d].forEach(e=>{
+        html+=`<div class="learn-entry"><div class="le-text">${esc(e.content)}</div>`;
+        if(e.keywords&&e.keywords.length) html+=`<div class="learn-keywords">${e.keywords.map(k=>`<span class="kw-tag">${esc(k)}</span>`).join('')}</div>`;
+        html+=`</div>`;
+      });
+    });
+    // Aggregate keywords
+    const allKW=[]; allLearn.forEach(e=>(e.keywords||[]).forEach(k=>allKW.push(k)));
+    const freq={}; allKW.forEach(k=>{freq[k]=(freq[k]||0)+1;});
+    const topKW=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    if(topKW.length){
+      html+=`<div class="learn-keywords" style="margin-top:10px">${topKW.map(([k,n])=>`<span class="kw-tag">${esc(k)}(${n})</span>`).join('')}</div>`;
+    }
+  } else html+=`<div class="empty">该时段无学习记录</div>`;
+
+  // Train summary
+  html+=`<div style="height:20px"></div><div class="section-label" style="font-size:0.9rem;font-weight:700">💪 训练（共 ${allTrain.length} 次）</div>`;
+  if(allTrain.length){
+    const allItems=[]; allTrain.forEach(e=>e.items.forEach(i=>allItems.push(i)));
+    const freq={}; allItems.forEach(i=>{freq[i]=(freq[i]||0)+1;});
+    const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+    html+=`<div class="chip-grid" style="margin-bottom:10px">`;
+    sorted.forEach(([item,n])=>{
+      const cls=STRENGTH.includes(item)?'tl-strength':'tl-cardio';
+      html+=`<span class="tl-tag ${cls}" style="font-size:0.82rem;padding:4px 14px">${item} ×${n}</span>`;
+    });
+    html+=`</div>`;
+    // By date
+    const byDate={};
+    allTrain.forEach(e=>{(byDate[e.date]=byDate[e.date]||[]).push(e);});
+    Object.keys(byDate).sort().forEach(d=>{
+      const dd=new Date(d);
+      html+=`<div class="section-label" style="margin-top:6px">${dd.getMonth()+1}.${dd.getDate()} ${weekdays[dd.getDay()]}</div>`;
+      byDate[d].forEach(e=>{
+        html+=`<div class="train-log"><div class="tl-items">${e.items.map(i=>`<span class="tl-tag ${STRENGTH.includes(i)?'tl-strength':'tl-cardio'}">${i}</span>`).join('')}</div><div class="intensity int-${e.intensity==='低'?'low':e.intensity==='中'?'mid':'high'}">🔥 ${e.intensity}等</div></div>`;
+      });
+    });
+    // Stats
+    const days=new Set(allTrain.map(e=>e.date)).size;
+    html+=`<div style="margin-top:10px;font-size:0.83rem;color:var(--sub)">📊 训练天数：${days}天 | 总次数：${allTrain.length}次 | 最常练：${sorted[0]?sorted[0][0]:'-'}</div>`;
+  } else html+=`<div class="empty">该时段无训练记录</div>`;
+
+  document.getElementById('sumBody').innerHTML=html;
 }
 
 initChips();
