@@ -98,6 +98,9 @@ textarea::placeholder { color: var(--muted); }
 .cardio-time input { width: 60px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.82rem; text-align: center; outline: none; }
 .cardio-time input:focus { border-color: var(--accent); }
 .empty { text-align: center; padding: 24px; color: var(--muted); font-size: 0.82rem; }
+.chip { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--sub); cursor: pointer; font-size: 0.82rem; transition: all .2s; user-select: none; }
+.chip:hover { border-color: var(--purple); }
+.chip.active { background: var(--purple); color: #fff; border-color: var(--purple); }
 </style>
 </head>
 <body>
@@ -163,8 +166,8 @@ textarea::placeholder { color: var(--muted); }
         <input type="number" id="cardioMinutes" placeholder="0" min="0" onchange="saveCardioTime()">
         <span>分钟</span>
       </div>
-      <div class="section-label" style="margin-top:12px">🌇 下午 · 无氧</div>
-      <div class="train-week" id="trainAfternoon"></div>
+      <div class="section-label" style="margin-top:12px">🌇 下午 · 无氧（选择部位）</div>
+      <div id="trainAfternoon"></div>
     </div>
   </div>
 </div>
@@ -234,7 +237,7 @@ function delKnowledge(id){saveArr('hub_knowledge',loadArr('hub_knowledge').filte
 
 // ── Training ──
 const DAYS=['周一','周二','周三','周四','周五','周六','周日'];
-const AFTERNOON_PLAN=['胸','肩膀','背部','腿','','',''];
+const STRENGTH_OPTIONS=['胸','肩膀','背部','腿'];
 
 function getWeekDates(){
   const d=new Date(curDate),dow=d.getDay()||7;
@@ -248,9 +251,11 @@ function toggleTrainMorning(dateStr){
   if(d[dateStr])delete d[dateStr];else d[dateStr]={done:true,time:nowTime()};
   save('hub_train_morning',d);render();
 }
-function toggleTrainAfternoon(dateStr){
+function toggleTrainAfternoon(dateStr,part){
   const d=load('hub_train_afternoon');
-  if(d[dateStr])delete d[dateStr];else d[dateStr]={done:true,time:nowTime()};
+  if(!d[dateStr])d[dateStr]={};
+  if(d[dateStr][part])delete d[dateStr][part];else d[dateStr][part]=true;
+  if(!Object.keys(d[dateStr]).length)delete d[dateStr];
   save('hub_train_afternoon',d);render();
 }
 function saveCardioTime(){
@@ -324,18 +329,30 @@ function render(){
     const mDone=!!morningData[dt];
     if(mDone)cardioCount++;
     mHTML+=`<div class="train-day ${isToday}"><div class="td-label">${DAYS[i]}</div><div class="td-detail">跑步</div><div class="td-check ${mDone?'done':''}" onclick="toggleTrainMorning('${dt}')"></div></div>`;
-    const label=AFTERNOON_PLAN[i];
-    const aDone=!!afternoonData[dt];
-    if(aDone&&label)strengthCount++;
-    if(label){
-      aHTML+=`<div class="train-day ${isToday}"><div class="td-label">${DAYS[i]}</div><div class="td-detail">${label}</div><div class="td-check ${aDone?'done':''}" onclick="toggleTrainAfternoon('${dt}')"></div></div>`;
-    } else {
-      aHTML+=`<div class="train-day ${isToday}" style="opacity:.35"><div class="td-label">${DAYS[i]}</div><div class="td-detail">休息</div><div class="td-check" style="cursor:default"></div></div>`;
+  });
+  // Afternoon: show 4 strength options as chips for the current date
+  const curAfternoon=afternoonData[dateStr]||{};
+  strengthCount=Object.values(afternoonData).reduce((n,v)=>n+Object.keys(v).length,0);
+  aHTML+='<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+  STRENGTH_OPTIONS.forEach(part=>{
+    const active=curAfternoon[part]?'active':'';
+    aHTML+=`<div class="chip chip-strength ${active}" onclick="toggleTrainAfternoon('${dateStr}','${part}')">${part}</div>`;
+  });
+  aHTML+='</div>';
+  // Show week overview
+  aHTML+='<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">';
+  weekDates.forEach((dt,i)=>{
+    const dayData=afternoonData[dt]||{};
+    const parts=Object.keys(dayData);
+    const isT=dt===todayStr;
+    if(parts.length){
+      aHTML+=`<span style="font-size:0.72rem;padding:3px 8px;border-radius:8px;background:rgba(139,92,246,.1);color:var(--purple);${isT?'border:1px solid var(--accent)':''}">${DAYS[i]}:${parts.join('/')}</span>`;
     }
   });
+  aHTML+='</div>';
   document.getElementById('trainMorning').innerHTML=mHTML;
   document.getElementById('trainAfternoon').innerHTML=aHTML;
-  document.getElementById('trainBadge').textContent=`${cardioCount+strengthCount}/7`;
+  document.getElementById('trainBadge').textContent=`有氧${cardioCount} 无氧${strengthCount}`;
   document.getElementById('trainStats').innerHTML=`<span>🫀 有氧 ${cardioCount}/3</span><span>🏋️ 无氧 ${strengthCount}/4</span>`;
   document.getElementById('cardioMinutes').value=cardioData[dateStr]||'';
 }
