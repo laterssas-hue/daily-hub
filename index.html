@@ -156,13 +156,15 @@ textarea::placeholder { color: var(--muted); }
     <div class="module-body">
       <div class="train-goal"><strong>🎯 每周目标：</strong>至少 3 次有氧（跑步）+ 4 次无氧（胸/肩膀/背部/腿）</div>
       <div id="trainStats" class="train-stats"></div>
-      <div class="section-label">📅 本周训练计划</div>
-      <div class="train-week" id="trainWeek"></div>
+      <div class="section-label">🌅 上午 · 有氧（跑步）</div>
+      <div class="train-week" id="trainMorning"></div>
       <div class="cardio-time">
         <span>🏃 今日跑步：</span>
         <input type="number" id="cardioMinutes" placeholder="0" min="0" onchange="saveCardioTime()">
         <span>分钟</span>
       </div>
+      <div class="section-label" style="margin-top:12px">🌇 下午 · 无氧</div>
+      <div class="train-week" id="trainAfternoon"></div>
     </div>
   </div>
 </div>
@@ -231,15 +233,8 @@ function toggleReview(id){
 function delKnowledge(id){saveArr('hub_knowledge',loadArr('hub_knowledge').filter(x=>x.id!==id));render();}
 
 // ── Training ──
-const TRAIN_PLAN=[
-  {day:'周一',type:'无氧',label:'胸'},
-  {day:'周二',type:'无氧',label:'肩膀'},
-  {day:'周三',type:'有氧',label:'跑步'},
-  {day:'周四',type:'无氧',label:'背部'},
-  {day:'周五',type:'无氧',label:'腿'},
-  {day:'周六',type:'有氧',label:'跑步'},
-  {day:'周日',type:'有氧',label:'跑步'},
-];
+const DAYS=['周一','周二','周三','周四','周五','周六','周日'];
+const AFTERNOON_PLAN=['胸','肩膀','背部','腿','','',''];
 
 function getWeekDates(){
   const d=new Date(curDate),dow=d.getDay()||7;
@@ -248,10 +243,15 @@ function getWeekDates(){
   for(let i=0;i<7;i++){const x=new Date(mon);x.setDate(mon.getDate()+i);dates.push(ds(x));}
   return dates;
 }
-function toggleTrainDay(dateStr){
-  const d=load('hub_train_week');
+function toggleTrainMorning(dateStr){
+  const d=load('hub_train_morning');
   if(d[dateStr])delete d[dateStr];else d[dateStr]={done:true,time:nowTime()};
-  save('hub_train_week',d);render();
+  save('hub_train_morning',d);render();
+}
+function toggleTrainAfternoon(dateStr){
+  const d=load('hub_train_afternoon');
+  if(d[dateStr])delete d[dateStr];else d[dateStr]={done:true,time:nowTime()};
+  save('hub_train_afternoon',d);render();
 }
 function saveCardioTime(){
   const m=document.getElementById('cardioMinutes').value;
@@ -313,19 +313,28 @@ function render(){
 
   // Training
   const weekDates=getWeekDates();
-  const trainData=load('hub_train_week');
+  const morningData=load('hub_train_morning');
+  const afternoonData=load('hub_train_afternoon');
   const cardioData=load('hub_cardio_time');
   const todayStr=ds(new Date());
-  let t='';
+  let mHTML='',aHTML='';
   let cardioCount=0,strengthCount=0;
   weekDates.forEach((dt,i)=>{
-    const plan=TRAIN_PLAN[i];
-    const isDone=!!trainData[dt];
-    if(isDone){if(plan.type==='有氧')cardioCount++;else strengthCount++;}
     const isToday=dt===todayStr?'today':'';
-    t+=`<div class="train-day ${isToday}"><div class="td-label">${plan.day}</div><div class="td-type">${plan.type}</div><div class="td-detail">${plan.label}</div><div class="td-check ${isDone?'done':''}" onclick="toggleTrainDay('${dt}')"></div></div>`;
+    const mDone=!!morningData[dt];
+    if(mDone)cardioCount++;
+    mHTML+=`<div class="train-day ${isToday}"><div class="td-label">${DAYS[i]}</div><div class="td-detail">跑步</div><div class="td-check ${mDone?'done':''}" onclick="toggleTrainMorning('${dt}')"></div></div>`;
+    const label=AFTERNOON_PLAN[i];
+    const aDone=!!afternoonData[dt];
+    if(aDone&&label)strengthCount++;
+    if(label){
+      aHTML+=`<div class="train-day ${isToday}"><div class="td-label">${DAYS[i]}</div><div class="td-detail">${label}</div><div class="td-check ${aDone?'done':''}" onclick="toggleTrainAfternoon('${dt}')"></div></div>`;
+    } else {
+      aHTML+=`<div class="train-day ${isToday}" style="opacity:.35"><div class="td-label">${DAYS[i]}</div><div class="td-detail">休息</div><div class="td-check" style="cursor:default"></div></div>`;
+    }
   });
-  document.getElementById('trainWeek').innerHTML=t;
+  document.getElementById('trainMorning').innerHTML=mHTML;
+  document.getElementById('trainAfternoon').innerHTML=aHTML;
   document.getElementById('trainBadge').textContent=`${cardioCount+strengthCount}/7`;
   document.getElementById('trainStats').innerHTML=`<span>🫀 有氧 ${cardioCount}/3</span><span>🏋️ 无氧 ${strengthCount}/4</span>`;
   document.getElementById('cardioMinutes').value=cardioData[dateStr]||'';
