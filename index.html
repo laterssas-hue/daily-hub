@@ -211,7 +211,7 @@ function addWorkTodo(){
 }
 function toggleTodo(id){
   const todos=loadArr('hub_todos'),t=todos.find(x=>x.id===id);
-  if(t){t.done=!t.done;t.doneTime=t.done?nowTime():null;saveArr('hub_todos',todos);render();}
+  if(t){t.done=!t.done;t.doneTime=t.done?nowTime():null;t.doneDate=t.done?ds(new Date()):null;saveArr('hub_todos',todos);render();}
 }
 function delTodo(id){saveArr('hub_todos',loadArr('hub_todos').filter(x=>x.id!==id));render();}
 function saveNotes(){const n=load('hub_notes');n[ds(curDate)]=document.getElementById('workNotes').value;save('hub_notes',n);}
@@ -272,14 +272,11 @@ function render(){
   const todayStr=ds(new Date());
   const todos=loadArr('hub_todos').filter(e=>{
     if(dateStr===todayStr){
-      // 今天：显示今天创建的 + 过去未完成的
-      return e.date===dateStr || (!e.done && e.date<=dateStr);
-    } else if(dateStr<todayStr){
-      // 历史日期：只显示当天的
-      return e.date===dateStr;
+      // 今天：显示今天创建的 + 过去未完成的 + 今天完成的(来自过去)
+      return e.date===dateStr || (!e.done && e.date<=dateStr) || (e.done && e.doneDate===dateStr);
     } else {
-      // 未来日期：只显示当天的
-      return e.date===dateStr;
+      // 其他日期：显示当天创建的 + 当天完成的
+      return e.date===dateStr || (e.done && e.doneDate===dateStr);
     }
   });
   todos.sort((a,b)=>{if(a.done!==b.done)return a.done?1:-1;return a.priority-b.priority;});
