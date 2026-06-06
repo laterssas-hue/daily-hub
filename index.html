@@ -269,7 +269,19 @@ function render(){
   const dateStr=ds(curDate);
 
   // Work
-  const todos=loadArr('hub_todos').filter(e=>e.date===dateStr);
+  const todayStr=ds(new Date());
+  const todos=loadArr('hub_todos').filter(e=>{
+    if(dateStr===todayStr){
+      // 今天：显示今天创建的 + 过去未完成的
+      return e.date===dateStr || (!e.done && e.date<=dateStr);
+    } else if(dateStr<todayStr){
+      // 历史日期：只显示当天的
+      return e.date===dateStr;
+    } else {
+      // 未来日期：只显示当天的
+      return e.date===dateStr;
+    }
+  });
   todos.sort((a,b)=>{if(a.done!==b.done)return a.done?1:-1;return a.priority-b.priority;});
   const done=todos.filter(e=>e.done),undone=todos.filter(e=>!e.done);
   document.getElementById('workBadge').textContent=`${todos.length} 项`;
