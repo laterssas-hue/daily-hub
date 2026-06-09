@@ -106,6 +106,16 @@ textarea::placeholder { color: var(--muted); }
 .week-summary-day-label { font-size: 0.75rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
 .week-summary-item { font-size: 0.8rem; color: var(--sub); padding: 2px 0; padding-left: 12px; }
 .week-summary-empty { font-size: 0.8rem; color: var(--muted); text-align: center; padding: 12px; }
+.week-review-card { border-radius: 10px; padding: 12px 14px; margin-bottom: 4px; }
+.week-review-card.met { background: linear-gradient(135deg, rgba(34,197,94,.08), rgba(6,182,212,.08)); border: 1px solid rgba(34,197,94,.3); }
+.week-review-card.missed { background: linear-gradient(135deg, rgba(239,68,68,.06), rgba(245,158,11,.06)); border: 1px solid rgba(239,68,68,.2); }
+.wr-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.wr-icon { font-size: 1.1rem; }
+.wr-title { font-size: 0.78rem; font-weight: 700; color: var(--sub); }
+.wr-status { margin-left: auto; font-size: 0.72rem; font-weight: 700; }
+.met .wr-status { color: var(--green); }
+.missed .wr-status { color: var(--red); }
+.wr-detail { font-size: 0.78rem; color: var(--sub); }
 </style>
 </head>
 <body>
@@ -167,6 +177,7 @@ textarea::placeholder { color: var(--muted); }
     <div class="module-header"><span class="icon">💪</span><h2>训练</h2><span class="badge badge-train" id="trainBadge">本周进度</span></div>
     <div class="module-body">
       <div class="train-goal"><strong>🎯 每周目标：</strong>至少 3 次有氧（跑步）+ 4 次无氧（胸/肩膀/背部/腿）</div>
+      <div id="lastWeekReview"></div>
       <div id="trainStats" class="train-stats"></div>
       <div class="section-label">🌅 上午 · 有氧（跑步）</div>
       <div class="train-week" id="trainMorning"></div>
@@ -362,15 +373,20 @@ function render(){
   const cardioData=load('hub_cardio_time');
   let mHTML='',aHTML='';
   let cardioCount=0,strengthCount=0;
+  // Count only THIS week's stats
   weekDates.forEach((dt,i)=>{
     const isToday=dt===todayStr?'today':'';
     const mDone=!!morningData[dt];
     if(mDone)cardioCount++;
     mHTML+=`<div class="train-day ${isToday}"><div class="td-label">${DAYS[i]}</div><div class="td-detail">跑步</div><div class="td-check ${mDone?'done':''}" onclick="toggleTrainMorning('${dt}')"></div></div>`;
   });
+  // Count strength only for this week
+  weekDates.forEach(dt=>{
+    const dayData=afternoonData[dt]||{};
+    strengthCount+=Object.keys(dayData).length;
+  });
   // Afternoon: show 4 strength options as chips for the current date
   const curAfternoon=afternoonData[dateStr]||{};
-  strengthCount=Object.values(afternoonData).reduce((n,v)=>n+Object.keys(v).length,0);
   aHTML+='<div style="display:flex;flex-wrap:wrap;gap:8px;">';
   STRENGTH_OPTIONS.forEach(part=>{
     const active=curAfternoon[part]?'active':'';
@@ -390,9 +406,46 @@ function render(){
   aHTML+='</div>';
   document.getElementById('trainMorning').innerHTML=mHTML;
   document.getElementById('trainAfternoon').innerHTML=aHTML;
-  document.getElementById('trainBadge').textContent=`有氧${cardioCount} 无氧${strengthCount}`;
-  document.getElementById('trainStats').innerHTML=`<span>🫀 有氧 ${cardioCount}/3</span><span>🏋️ 无氧 ${strengthCount}/4</span>`;
+
+  // This week status
+  const cardioGoal=cardioCount>=3, strengthGoal=strengthCount>=4;
+  const thisWeekMet=cardioGoal&&strengthGoal;
+  document.getElementById('trainBadge').textContent=thisWeekMet?'✅ 本周达标':'进行中';
+  document.getElementById('trainStats').innerHTML=`<span>🫀 有氧 ${cardioCount}/3 ${cardioGoal?'✅':'⏳'}</span><span>🏋️ 无氧 ${strengthCount}/4 ${strengthGoal?'✅':'⏳'}</span>`;
   document.getElementById('cardioMinutes').value=cardioData[dateStr]||'';
+
+  // Last week review
+  renderLastWeekReview();
+}
+
+// ── Last Week Review ──
+function getLastWeekDates(){
+  const d=new Date(curDate),dow=d.getDay()||7;
+  const mon=new Date(d);mon.setDate(d.getDate()-(dow-1)-7);
+  const dates=[];
+  for(let i=0;i<7;i++){const x=new Date(mon);x.setDate(mon.getDate()+i);dates.push(ds(x));}
+  return dates;
+}
+function renderLastWeekReview(){
+  const lastWeekDates=getLastWeekDates();
+  const morningData=load('hub_train_morning');
+  const afternoonData=load('hub_train_afternoon');
+  let lwCardio=0,lwStrength=0;
+  lastWeekDates.forEach(dt=>{
+    if(morningData[dt])lwCardio++;
+    const dayData=afternoonData[dt]||{};
+    lwStrength+=Object.keys(dayData).length;
+  });
+  const lwCardioOk=lwCardio>=3,lwStrengthOk=lwStrength>=4;
+  const lwMet=lwCardioOk&&lwStrengthOk;
+  const weekLabel=`${lastWeekDates[0].slice(5)} ~ ${lastWeekDates[6].slice(5)}`;
+  const el=document.getElementById('lastWeekReview');
+  // Only show if there's any data last week
+  if(lwCardio===0&&lwStrength===0){el.innerHTML='';return;}
+  el.innerHTML=`<div class="week-review-card ${lwMet?'met':'missed'}">
+    <div class="wr-header"><span class="wr-icon">${lwMet?'🎉':'⚠️'}</span><span class="wr-title">上周回顾 (${weekLabel})</span><span class="wr-status">${lwMet?'达标 ✅':'未达标 ❌'}</span></div>
+    <div class="wr-detail">有氧 ${lwCardio}/3 ${lwCardioOk?'✅':'❌'} ｜ 无氧 ${lwStrength}/4 ${lwStrengthOk?'✅':'❌'}</div>
+  </div>`;
 }
 
 // Keyboard shortcuts
